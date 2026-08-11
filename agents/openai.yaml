@@ -1,0 +1,4 @@
+interface:
+  display_name: "macOS Codex 代理配置"
+  short_description: "持久化配置 Clash 代理并验证 Codex HTTP 与 WSS 连接"
+  default_prompt: "使用 $codex-proxy-macos 检查并配置 macOS 上的 Clash 代理。"
