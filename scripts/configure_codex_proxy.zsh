@@ -88,7 +88,7 @@ set_session_proxy() {
 
 make_plist() {
   local output="$1" command quoted_proxy escaped_command
-  quoted_proxy="$(/usr/bin/printf '%q' "$proxy_url")"
+  # zsh parameter quoting is portable on macOS; BSD printf does not implement %q.\n  quoted_proxy="${(q)proxy_url}"
   command="proxy_url=$quoted_proxy; for name in HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy; do /bin/launchctl setenv \"\$name\" \"\$proxy_url\"; done; for name in NO_PROXY no_proxy; do /bin/launchctl setenv \"\$name\" \"127.0.0.1,localhost,::1\"; done"
   escaped_command="$(escape_xml "$command")"
   {
