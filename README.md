@@ -6,7 +6,7 @@
 
 ## 安装
 
-在另一台 Mac 上运行：
+在 Mac 上运行：
 
 ```bash
 python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
