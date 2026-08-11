@@ -41,18 +41,26 @@ cp -R /tmp/codex-proxy-macos/. ~/.codex/skills/codex-proxy-macos/
 zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --check
 ```
 
-已知 Clash 端口时配置（把示例端口换成实际端口）：
+本机 HTTP/mixed 端口由代理软件决定，配置时显式填写：
 
 ```zsh
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --port 7897
+read -r "PROXY_PORT?请输入代理软件的 HTTP/mixed 端口: "
+zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --port "$PROXY_PORT"
 ```
 
-不确定时可以省略 `--port`，脚本会自动检查常见端口。
+如果使用其他地址或 SOCKS 代理，传入完整 URL：
+
+```zsh
+read -r "PROXY_URL?请输入代理 URL: "
+zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --proxy "$PROXY_URL"
+```
+
+省略参数时，脚本只读取已有代理环境或 macOS 系统代理，不会猜测端口。
 
 预览和卸载：
 
 ```zsh
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --port 7897 --dry-run
+zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --dry-run --proxy "$PROXY_URL"
 zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --uninstall
 ```
 

@@ -2,7 +2,6 @@
 set -euo pipefail
 
 typeset skill_label="com.codex.proxy-env"
-typeset -a candidate_ports=(7897 7890 7891 7892 7893 9090)
 typeset action="install"
 typeset proxy_url=""
 typeset explicit_port=""
@@ -56,19 +55,24 @@ detect_proxy() {
     return
   fi
   local existing
-  existing="$(/bin/launchctl getenv HTTPS_PROXY 2>/dev/null || true)"
-  if [[ -n "$existing" && "$existing" == (http|https|socks5|socks5h)://127.0.0.1:* ]]; then
-    proxy_url="$existing"
-    return
-  fi
-  local port
-  for port in $candidate_ports; do
-    if listener_exists "$port"; then
-      proxy_url="http://127.0.0.1:$port"
+  existing="${CODEX_PROXY_URL:-${HTTPS_PROXY:-${https_proxy:-${HTTP_PROXY:-${http_proxy:-}}}}}"
+  [[ -z "$existing" ]] && existing="$(/bin/launchctl getenv HTTPS_PROXY 2>/dev/null || true)"
+  if [[ -n "$existing" ]]; then
+    if proxy_is_valid "$existing"; then
+      proxy_url="$existing"
       return
     fi
-  done
-  print -u2 -- "No Clash HTTP/mixed listener found. Re-run with --proxy URL or --port PORT."
+  fi
+
+  local system_proxy system_port
+  system_proxy="$(/usr/sbin/scutil --proxy 2>/dev/null | /usr/bin/awk '/HTTPSProxy :/ {https=$3} /HTTPProxy :/ {http=$3} END {print (https != "" ? https : http)}')"
+  system_port="$(/usr/sbin/scutil --proxy 2>/dev/null | /usr/bin/awk '/HTTPSPort :/ {https=$3} /HTTPPort :/ {http=$3} END {print (https != "" ? https : http)}')"
+  if [[ -n "$system_proxy" && -n "$system_port" && "$system_proxy" != "<none>" && "$system_port" == <-> ]]; then
+    proxy_url="http://$system_proxy:$system_port"
+    return
+  fi
+
+  print -u2 -- "No proxy URL found. Re-run with --proxy URL or --port PORT."
   return 1
 }
 

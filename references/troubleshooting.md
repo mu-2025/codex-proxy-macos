@@ -21,7 +21,8 @@ WSS 通常会复用 HTTPS 的 CONNECT 隧道。curl 测试通过后，如果 App
 
 ## 常见处理
 
-- 端口不对：在 Clash 设置中找到 HTTP 或 mixed 端口，再用 `--port` 指定。
+- 端口不对：在代理软件设置中找到 HTTP 或 mixed 端口，再用 `--port` 指定；不要依赖默认端口。
+- 没有显式参数时找不到代理：设置 `CODEX_PROXY_URL`，或直接使用 `--proxy URL`。
 - 只有 SOCKS 端口：优先在 Clash 开启 HTTP/mixed 端口，不要假设所有 App 都支持 SOCKS 代理变量。
 - 变量有值但 App 不通：检查 VPN、网络过滤器或公司代理是否接管了连接。
 - 恢复原状：运行 `--uninstall`。替换已有配置前，脚本会保留带时间的备份。

@@ -10,7 +10,7 @@ description: 在 macOS 上为 Codex 或 ChatGPT 桌面 App 配置持久化 Clash
 ## 使用流程
 
 1. 先运行 `--check` 查看当前状态。只诊断时不要执行安装。
-2. 运行脚本安装配置：
+2. 运行脚本安装配置。代理软件和端口由本机决定，优先显式指定：
 
    ```zsh
    zsh scripts/configure_codex_proxy.zsh --port <Clash 的 HTTP/mixed 端口>
@@ -22,7 +22,7 @@ description: 在 macOS 上为 Codex 或 ChatGPT 桌面 App 配置持久化 Clash
    zsh scripts/configure_codex_proxy.zsh --proxy http://127.0.0.1:<端口>
    ```
 
-   不确定端口时省略参数，脚本会检查常见端口；找不到时再根据 Clash 设置显式指定。
+   `--port` 适用于本机 HTTP/mixed 端口；其他地址或 SOCKS 代理使用 `--proxy URL`。如果省略参数，脚本只会读取已有代理环境或 macOS 系统代理，不会猜测端口。
 3. 配置完成后完全退出并重新打开 Codex（`⌘Q`），让新进程继承代理环境。
 4. 卸载：
 
@@ -36,6 +36,8 @@ description: 在 macOS 上为 Codex 或 ChatGPT 桌面 App 配置持久化 Clash
 - `--dry-run`：只检测并预览，不修改系统。
 - `--skip-network-test`：跳过联网验证，网络恢复后再验证。
 - `--uninstall`：删除本 Skill 创建的配置。
+
+也可以先设置 `CODEX_PROXY_URL`，再运行脚本；命令行参数优先级更高。
 
 ## 注意事项
 
