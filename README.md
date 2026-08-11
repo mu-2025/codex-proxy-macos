@@ -4,6 +4,18 @@
 
 本仓库就是一个 Codex Skill，不修改 App 文件，也不需要 zip。
 
+## 推荐：直接让 Agent 处理
+
+不想手动安装或执行脚本时，在 Codex 新建对话，把下面这段话发给 Agent：
+
+```text
+请使用 https://github.com/mu-2025/codex-proxy-macos 中的 codex-proxy-macos Skill，帮我解决 Codex 新建会话反复重连的问题。
+请先检查本机代理环境和代理软件的 HTTP/mixed 或 SOCKS 地址；需要时再询问我代理 URL 或端口。
+请由你完成 Skill 安装、配置和连接验证，不要让我手动复制脚本或修改 App 文件。
+```
+
+Agent 会负责安装 Skill、检查本机环境、在缺少信息时询问代理地址或端口、执行配置并验证连接。配置完成后，按提示完全退出并重新打开 Codex 即可。
+
 ## 安装
 
 在 Mac 上运行：
