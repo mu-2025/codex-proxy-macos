@@ -1,85 +1,51 @@
 # macOS Codex 代理 Skill
 
-为 Codex / ChatGPT macOS 桌面 App 配置持久化 Clash 代理，解决新建会话反复重连、HTTP 请求正常但 WebSocket/WSS 连接失败的问题。
+为 Codex / ChatGPT macOS App 配置持久化代理，解决新会话反复重连或 WSS 连接失败。
 
-本仓库就是一个 Codex Skill，不修改 App 文件，也不需要 zip。
+## 推荐：让 Agent 直接处理
 
-## 推荐：直接让 Agent 处理
-
-不想手动安装或执行脚本时，在 Codex 新建对话，把下面这段话发给 Agent：
+在 Codex 新建对话，发送：
 
 ```text
-请使用 https://github.com/mu-2025/codex-proxy-macos 中的 codex-proxy-macos Skill，帮我解决 Codex 新建会话反复重连的问题。
-请先检查本机代理环境和代理软件的 HTTP/mixed 或 SOCKS 地址；需要时再询问我代理 URL 或端口。
-请由你完成 Skill 安装、配置和连接验证，不要让我手动复制脚本或修改 App 文件。
+请使用 https://github.com/mu-2025/codex-proxy-macos 中的 codex-proxy-macos Skill，解决 Codex 新建会话反复重连问题。
+请检查本机代理环境；如果缺少代理 URL 或端口，再向我询问。请由你完成安装、配置和验证，不要让我手动执行脚本。
 ```
 
-Agent 会负责安装 Skill、检查本机环境、在缺少信息时询问代理地址或端口、执行配置并验证连接。配置完成后，按提示完全退出并重新打开 Codex 即可。
-
-## 安装
-
-在 Mac 上运行：
+## 手动安装
 
 ```bash
 python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
-  --repo mu-2025/codex-proxy-macos \
-  --path . \
-  --name codex-proxy-macos
+  --repo mu-2025/codex-proxy-macos --path . --name codex-proxy-macos
 ```
 
-安装后在 Codex 中调用：
+安装后调用：
 
 ```text
 $codex-proxy-macos
 ```
 
-例如：
-
-> 检查 Clash 的 HTTP/mixed 端口，为 Codex 配置持久化代理并验证连接。
-
-如果没有 Skill 安装器，也可以直接克隆：
-
-```bash
-git clone git@github.com:mu-2025/codex-proxy-macos.git /tmp/codex-proxy-macos
-mkdir -p ~/.codex/skills
-cp -R /tmp/codex-proxy-macos/. ~/.codex/skills/codex-proxy-macos/
-```
-
-## 直接运行
-
-先查看状态：
+## 手动配置（可选）
 
 ```zsh
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --check
-```
+SCRIPT=~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh
 
-本机 HTTP/mixed 端口由代理软件决定，配置时显式填写：
+# 查看状态
+zsh "$SCRIPT" --check
 
-```zsh
-read -r "PROXY_PORT?请输入代理软件的 HTTP/mixed 端口: "
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --port "$PROXY_PORT"
-```
+# 指定本机 HTTP/mixed 端口
+read -r "PROXY_PORT?请输入端口: "
+zsh "$SCRIPT" --port "$PROXY_PORT"
 
-如果使用其他地址或 SOCKS 代理，传入完整 URL：
-
-```zsh
+# 指定完整代理 URL（HTTP/HTTPS/SOCKS）
 read -r "PROXY_URL?请输入代理 URL: "
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --proxy "$PROXY_URL"
+zsh "$SCRIPT" --proxy "$PROXY_URL"
+
+# 卸载
+zsh "$SCRIPT" --uninstall
 ```
 
-省略参数时，脚本只读取已有代理环境或 macOS 系统代理，不会猜测端口。
+端口或 URL 由本机代理软件决定；不传参数时，脚本只读取已有代理环境或 macOS 系统代理，不会猜测端口。
 
-预览和卸载：
-
-```zsh
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --dry-run --proxy "$PROXY_URL"
-zsh ~/.codex/skills/codex-proxy-macos/scripts/configure_codex_proxy.zsh --uninstall
-```
-
-## 工作方式
-
-脚本会在当前用户的 GUI 会话设置 `HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY` 及小写形式，并创建用户级 LaunchAgent，在登录时自动恢复。它不修改 Codex/ChatGPT App，因此 App 更新不会覆盖配置。
-
-完成后请完全退出并重新打开 Codex（`⌘Q`）。`401` 或 `403` 通常表示请求已经通过代理到达服务端；超时或拒绝连接才表示代理链路失败。
+配置后完全退出并重新打开 Codex。测试返回 `401`/`403` 通常表示代理链路已连通；超时或拒绝连接才表示失败。
 
 详细排查见 [references/troubleshooting.md](references/troubleshooting.md)。
